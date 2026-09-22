@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#004f63">
+<title>FIRST CANOPY — Envio de proposta</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topography" aria-hidden="true"></div>
+<header class="hero">
+  <img class="sesi" src="assets/sesi-logo.svg" alt="SESI — Serviço Social da Indústria">
+  <img class="brand" src="assets/first-canopy-logo.svg" alt="FIRST CANOPY">
+  <h1>Crie o próximo troféu.</h1>
+  <p>Apresente a proposta de troféu criada pela sua equipe.</p>
+</header>
+
+<main class="shell">
+<form id="proposalForm" class="card" novalidate>
+  <div class="intro">
+    <div><span>ENVIO DE PROPOSTA</span><h2>Dados da equipe e arquivos</h2></div>
+    <p>Todos os campos são obrigatórios.</p>
+  </div>
+
+  <section class="section">
+    <b class="badge">01</b>
+    <div class="section-body">
+      <h3>Dados da equipe</h3>
+      <p class="sub">Informe o nome da equipe e pelo menos três integrantes.</p>
+      <label>Nome da equipe <em>*</em>
+        <input id="teamName" name="teamName" type="text" placeholder="Digite o nome da equipe" required>
+      </label>
+      <small id="teamNameError" class="error"></small>
+
+      <label>Integrantes da equipe <em>*</em></label>
+      <p class="hint">Mínimo de 3 e máximo de 10 integrantes.</p>
+      <div id="memberList" class="members">
+        <div class="member"><i>1</i><input class="member-name" name="members" type="text" placeholder="Nome completo do integrante 1" required><button type="button" class="remove" aria-label="Remover integrante">×</button></div>
+        <div class="member"><i>2</i><input class="member-name" name="members" type="text" placeholder="Nome completo do integrante 2" required><button type="button" class="remove" aria-label="Remover integrante">×</button></div>
+        <div class="member"><i>3</i><input class="member-name" name="members" type="text" placeholder="Nome completo do integrante 3" required><button type="button" class="remove" aria-label="Remover integrante">×</button></div>
+      </div>
+      <button id="addMember" class="add" type="button">＋ Adicionar integrante</button>
+      <small id="membersError" class="error"></small>
+    </div>
+  </section>
+
+  <section class="section">
+    <b class="badge">02</b>
+    <div class="section-body">
+      <h3>Contato</h3>
+      <p class="sub">Use um telefone e um e-mail que a equipe acompanhe.</p>
+      <div class="cols">
+        <div><label>Telefone de contato <em>*</em><input id="phone" name="phone" type="tel" placeholder="(00) 00000-0000" required></label><small id="phoneError" class="error"></small></div>
+        <div><label>E-mail de contato <em>*</em><input id="email" name="email" type="email" placeholder="seuemail@exemplo.com" required></label><small id="emailError" class="error"></small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <b class="badge">03</b>
+    <div class="section-body">
+      <h3>Apresentação do conceito</h3>
+      <p class="sub">Inclua conceito, dimensões e materiais da proposta.</p>
+      <label id="conceptBox" class="upload">
+        <strong>Adicionar apresentação <em>*</em></strong>
+        <span>PDF, PPT ou PPTX • Máx. 5 MB</span>
+        <small id="conceptName">Nenhum arquivo selecionado.</small>
+        <input id="conceptFile" name="conceptFile" type="file" accept=".pdf,.ppt,.pptx" hidden required>
+      </label>
+      <small id="conceptError" class="error"></small>
+    </div>
+  </section>
+
+  <section class="section">
+    <b class="badge">04</b>
+    <div class="section-body">
+      <h3>Artes do troféu</h3>
+      <p class="sub">Envie renderings, vistas ou pranchas finais da proposta.</p>
+      <label id="artsBox" class="upload">
+        <strong>Adicionar artes <em>*</em></strong>
+        <span>PDF, PNG ou JPG • Máx. 10 MB por arquivo</span>
+        <small id="artsName">Nenhum arquivo selecionado.</small>
+        <input id="artFiles" name="artFiles" type="file" accept=".pdf,.png,.jpg,.jpeg" multiple hidden required>
+      </label>
+      <small id="artsError" class="error"></small>
+    </div>
+  </section>
+
+  <div id="formMessage" class="message" role="alert" aria-live="polite"></div>
+  <div class="actions"><button id="submitProposal" type="submit" disabled>Enviar proposta <span>→</span></button></div>
+</form>
+</main>
+
+<div id="successModal" class="modal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <div class="check">✓</div>
+    <h2>Proposta enviada com sucesso.</h2>
+    <p id="successText">A proposta foi encaminhada.</p>
+    <button id="closeSuccess" type="button">Fechar</button>
+  </div>
+</div>
+<script src="app.js" defer></script>
+</body>
+</html>
