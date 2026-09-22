@@ -22,11 +22,40 @@ function safeName(name) {
     .replace(/^-|-$/g, '') || 'arquivo';
 }
 
-function proposalId() {
+async function nextProposalId(env) {
   const year = new Date().getUTCFullYear();
-  const stamp = Date.now().toString(36).toUpperCase();
-  const rand = crypto.randomUUID().slice(0, 6).toUpperCase();
-  return `FC-${year}-${stamp}-${rand}`;
+
+  await env.DB.exec(`
+    CREATE TABLE IF NOT EXISTS proposal_counters (
+      year INTEGER PRIMARY KEY,
+      value INTEGER NOT NULL DEFAULT 0
+    );
+  `);
+
+  const results = await env.DB.batch([
+    env.DB.prepare(`
+      INSERT INTO proposal_counters (year, value)
+      VALUES (?, 0)
+      ON CONFLICT(year) DO NOTHING
+    `).bind(year),
+    env.DB.prepare(`
+      UPDATE proposal_counters
+      SET value = value + 1
+      WHERE year = ?
+    `).bind(year),
+    env.DB.prepare(`
+      SELECT value
+      FROM proposal_counters
+      WHERE year = ?
+    `).bind(year)
+  ]);
+
+  const row = results[2]?.results?.[0];
+  if (!row || !Number.isInteger(Number(row.value))) {
+    throw new Error('Não foi possível gerar o número sequencial da proposta.');
+  }
+
+  return `FC-${year}-${String(Number(row.value)).padStart(4, '0')}`;
 }
 
 function b64(buf) {
@@ -156,7 +185,14 @@ async function submit(request, env) {
   const total = concept.size + arts.reduce((s, f) => s + f.size, 0);
   if (total > MT) return json({ error: 'O total dos anexos deve ser de no máximo 25 MB.' }, 400);
 
-  const id = proposalId();
+  let id;
+  try {
+    id = await nextProposalId(env);
+  } catch (error) {
+    console.error('Proposal ID error', error);
+    return json({ error: 'Não foi possível gerar o número da proposta. Tente novamente.' }, 500);
+  }
+
   const uploaded = [];
   let conceptKey;
   const artKeys = [];
