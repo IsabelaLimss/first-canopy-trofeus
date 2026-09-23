@@ -82,7 +82,7 @@ async function putFile(env, id, folder, file, index = null) {
   return key;
 }
 
-async function trySendEmail(env, team, phone, mail, members, concept, arts, id) {
+async function trySendEmail(env, team, phone, mail, members, concept, arts, docs, details, id) {
   if (!env.RESEND_API_KEY || !env.FROM_EMAIL) {
     return { sent: false, reason: 'email_not_configured' };
   }
@@ -90,7 +90,8 @@ async function trySendEmail(env, team, phone, mail, members, concept, arts, id) 
   try {
     const attachments = [
       await attachment(concept),
-      ...await Promise.all(arts.map(attachment))
+      ...await Promise.all(arts.map(attachment)),
+      await attachment(docs)
     ];
 
     const subject = `FIRST CANOPY — Proposta ${id} — ${team}`;
@@ -99,6 +100,9 @@ async function trySendEmail(env, team, phone, mail, members, concept, arts, id) 
       `Equipe: ${team}`,
       `Telefone: ${phone}`,
       `E-mail: ${mail}`,
+      `Proposta: ${details.name}`,
+      `Descrição: ${details.description}`,
+      `Materiais e técnicas: ${details.materials}`,
       '',
       'Integrantes:',
       ...members.map((m, i) => `${i + 1}. ${m}`)
@@ -153,8 +157,12 @@ async function submit(request, env) {
   const members = fd.getAll('members').map(clean).filter(Boolean);
   const concept = fd.get('conceptFile');
   const arts = fd.getAll('artFiles').filter(isUpload);
+  const docs = fd.get('docsFile');
+  const details = { name: clean(fd.get('proposalName')), description: clean(fd.get('proposalDescription')), materials: clean(fd.get('materials')) };
 
   if (!team) return json({ error: 'Informe o nome da equipe.' }, 400);
+  if (!details.name || details.name.length > 150 || !details.description || details.description.length > 1000 || !details.materials || details.materials.length > 500) return json({ error: 'Preencha todos os campos da proposta dentro dos limites indicados.' }, 400);
+  if (!isUpload(docs) || !docs.name || ext(docs.name) !== 'pdf' || docs.size > MA) return json({ error: 'Envie a documentação complementar em PDF de até 10 MB.' }, 400);
   if (members.length < MIN) return json({ error: 'Informe pelo menos 3 integrantes.' }, 400);
   if (members.length > MAX) return json({ error: 'O limite é de 10 integrantes.' }, 400);
 
@@ -182,7 +190,7 @@ async function submit(request, env) {
     return json({ error: 'Cada arte deve ter no máximo 10 MB.' }, 400);
   }
 
-  const total = concept.size + arts.reduce((s, f) => s + f.size, 0);
+  const total = concept.size + docs.size + arts.reduce((s, f) => s + f.size, 0);
   if (total > MT) return json({ error: 'O total dos anexos deve ser de no máximo 25 MB.' }, 400);
 
   let id;
@@ -201,6 +209,13 @@ async function submit(request, env) {
     conceptKey = await putFile(env, id, 'conceito', concept);
     uploaded.push(conceptKey);
 
+    const docsKey = await putFile(env, id, 'documentacao', docs);
+    uploaded.push(docsKey);
+    artKeys.push(docsKey);
+    const detailsKey = `${id}/proposta/dados.json`;
+    await env.FILES.put(detailsKey, JSON.stringify(details), { httpMetadata: { contentType: 'application/json' } });
+    uploaded.push(detailsKey);
+    artKeys.push(detailsKey);
     for (let i = 0; i < arts.length; i++) {
       const key = await putFile(env, id, 'artes', arts[i], i + 1);
       uploaded.push(key);
@@ -234,7 +249,7 @@ async function submit(request, env) {
     return json({ error: 'Não foi possível registrar os dados da proposta. Tente novamente.' }, 500);
   }
 
-  const emailResult = await trySendEmail(env, team, phone, mail, members, concept, arts, id);
+  const emailResult = await trySendEmail(env, team, phone, mail, members, concept, arts, docs, details, id);
 
   return json({
     ok: true,
