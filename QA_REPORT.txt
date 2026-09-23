@@ -1,0 +1,14 @@
+FIRST CANOPY — QA v5
+
+Correções principais:
+- Animação isolada do código do formulário: SIM
+- Animação sem SMIL: SIM
+- Web Animations API usada nas paths vetoriais reais de C/A/N/O/P/Y: SIM
+- Novo arquivo logo-animation-v5.js com cache busting: SIM
+- styles-v5.css e app-v5.js versionados para evitar cache antigo: SIM
+- Fallback para logo completa em qualquer erro: SIM
+- Campo Nome da equipe editável: SIM
+- Validação mínima de 3 integrantes mantida: SIM
+- Envio bloqueado quando incompleto: SIM
+
+Observação: a v5 evita o principal risco da v4: o código de animação não depende mais do restante do app.js e não fica invisível por preferência de movimento reduzido; nesse caso, há uma animação curta de revelação.

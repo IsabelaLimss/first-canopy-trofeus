@@ -7,18 +7,5 @@
     "directory": ".",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
-  },
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "first-canopy-propostas",
-      "database_id": "b807fa87-f226-426b-83dd-298e34806fe7"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "FILES",
-      "bucket_name": "first-canopy-arquivos"
-    }
-  ]
+  }
 }

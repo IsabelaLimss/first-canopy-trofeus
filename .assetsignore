@@ -1,5 +1,7 @@
 _worker.js
 wrangler.jsonc
-README.md
 .assetsignore
+README.txt
+QA_REPORT.txt
+qa/*
 .git*
