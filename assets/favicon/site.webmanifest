@@ -1,0 +1,14 @@
+{
+  "name": "FIRST CANOPY",
+  "short_name": "FIRST CANOPY",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#003b4e",
+  "background_color": "#003b4e",
+  "display": "standalone"
+}
