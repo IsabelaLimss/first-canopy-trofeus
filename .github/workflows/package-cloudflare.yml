@@ -1,0 +1,21 @@
+name: Package Cloudflare ZIP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build deploy ZIP
+        run: |
+          zip -r first-canopy-cloudflare.zip .             -x ".git/*"                ".github/*"                "qa/*"
+      - name: Upload deploy ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-canopy-cloudflare
+          path: first-canopy-cloudflare.zip
+          if-no-files-found: error
